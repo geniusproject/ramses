@@ -192,9 +192,6 @@ class CollectionView(BaseView):
         return self.update(**kwargs)
 
     def delete(self, **kwargs):
-        es_items = set([item.id for item in self.get_collection_es()])
-        db_items = set([item.id for item in self.get_collection()])
-        log.error('ES shadow items {} for type {}'.format(es_items - db_items, self.Model))
         obj = self.get_item(**kwargs)
         obj.delete(self.request)
 
@@ -444,6 +441,9 @@ class ItemSingularView(ItemSubresourceBaseView):
         return self.update(**kwargs)
 
     def delete(self, **kwargs):
+        es_items = set([item.id for item in self.get_collection_es()])
+        db_items = set([item.id for item in self.get_collection()])
+        log.error('ES shadow items {} for type {}'.format(es_items - db_items, self.Model))
         parent_obj = self.get_item(**kwargs)
         obj = getattr(parent_obj, self.attr)
         obj.delete(self.request)
