@@ -166,6 +166,7 @@ def generate_model_cls(config, schema, model_name, raml_resource,
     model_cls = metaclass(model_name, tuple(bases), attrs)
     setup_model_event_subscribers(config, model_cls, schema)
     setup_fields_processors(config, model_cls, schema)
+    setup_field_watchers(config, model_cls, schema)
     return model_cls, auth_model
 
 
@@ -231,6 +232,20 @@ def setup_model_event_subscribers(config, model_cls, schema):
             sub_func = resolve_to_callable(sub_name)
             config.subscribe_to_events(
                 sub_func, event_objects, **event_kwargs)
+
+
+def setup_field_watchers(config, model_cls, schema):
+    field_watchers = schema.get('_field_watchers', {})
+    allowed_fields = schema['properties'].keys()
+
+    for field_name, subcribers in field_watchers.items():
+        if field_name not in allowed_fields:
+            log.warning('Model {} doesnt contain field {}, skipping'.format(model_cls.__name__, field_name))
+            continue
+
+        for sub_name in subcribers:
+            sub_func = resolve_to_callable(sub_name)
+            model_cls.add_field_watcher(field_name, sub_func)
 
 
 def setup_fields_processors(config, model_cls, schema):
