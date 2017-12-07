@@ -167,6 +167,7 @@ def generate_model_cls(config, schema, model_name, raml_resource,
     setup_model_event_subscribers(config, model_cls, schema)
     setup_fields_processors(config, model_cls, schema)
     setup_field_watchers(config, model_cls, schema)
+    setup_sort_methods(config, model_cls, schema)
     return model_cls, auth_model
 
 
@@ -246,6 +247,14 @@ def setup_field_watchers(config, model_cls, schema):
         for sub_name in subcribers:
             sub_func = resolve_to_callable(sub_name)
             model_cls.add_field_watcher(field_name, sub_func)
+
+
+def setup_sort_methods(config, model_cls, schema):
+    sort_methods = schema.get('_sort_methods', {})
+
+    for sort_name, subscriber in sort_methods.items():
+        sub_func = resolve_to_callable(subscriber)
+        model_cls.add_sort_method(sort_name, sub_func)
 
 
 def setup_fields_processors(config, model_cls, schema):
