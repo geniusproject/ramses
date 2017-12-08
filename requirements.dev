@@ -4,7 +4,7 @@ pytest-cov
 releases
 sphinx
 
-git+https://github.com/geniusproject/nefertari.git@develop#egg=nefertari
-git+https://github.com/geniusproject/nefertari-guards.git@develop#egg=nefertari-guards
+git+https://github.com/geniusproject/nefertari.git@custom_sort#egg=nefertari
+git+https://github.com/geniusproject/nefertari-guards.git@custom_sort#egg=nefertari-guards
 
 -e .
