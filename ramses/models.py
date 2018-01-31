@@ -166,6 +166,7 @@ def generate_model_cls(config, schema, model_name, raml_resource,
     model_cls = metaclass(model_name, tuple(bases), attrs)
     setup_model_event_subscribers(config, model_cls, schema)
     setup_fields_processors(config, model_cls, schema)
+    setup_sort_methods(config, model_cls, schema)
     return model_cls, auth_model
 
 
@@ -231,6 +232,14 @@ def setup_model_event_subscribers(config, model_cls, schema):
             sub_func = resolve_to_callable(sub_name)
             config.subscribe_to_events(
                 sub_func, event_objects, **event_kwargs)
+
+
+def setup_sort_methods(config, model_cls, schema):
+    sort_methods = schema.get('_sort_methods', {})
+
+    for sort_name, subscriber in sort_methods.items():
+        sub_func = resolve_to_callable(subscriber)
+        model_cls.add_sort_method(sort_name, sub_func)
 
 
 def setup_fields_processors(config, model_cls, schema):
