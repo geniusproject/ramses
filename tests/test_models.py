@@ -382,6 +382,23 @@ class TestSubscribersSetup(object):
         ])
 
     @patch('ramses.models.resolve_to_callable')
+    def test_setup_model_custom_sort_methods(self, mock_resolve):
+        from ramses import models
+        config = Mock()
+        model = Mock()
+        model.add_sort_method = Mock()
+
+        schema = {
+            '_sort_methods': {
+                'last_opened': 'sort_by_activities'
+            }
+        }
+
+        models.setup_sort_methods(config, model, schema)
+        mock_resolve.assert_has_calls([call('sort_by_activities')])
+        model.add_sort_method.assert_has_calls([call('last_opened', mock_resolve())])
+
+    @patch('ramses.models.resolve_to_callable')
     @patch('ramses.models.engine')
     def test_setup_fields_processors(self, mock_eng, mock_resolve):
         from ramses import models
